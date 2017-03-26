@@ -1,39 +1,87 @@
 #include <iostream>
 #include "units.h"
 #include <string>
+#include <fstream>
 
 int main(int argc, char **argv)
 {
 	Array martin;
+	List josh;
+	Bheap anthony;
 
-	martin.addElem_tail(14);
-	std::cout << "Number " << martin.p[0] << "\n";
-
-	martin.addElem_tail(22);
-	std::cout << "Number " << martin.p[0] << " and " << martin.p[1] << "\n";
-
-	int number;
-	bool end = false;
+	std::fstream in;
 	std::string answ;
-	while (!end)
-	{
-		std::cin >> number;
-		martin.addElem_tail(number);
-		//std::cout << "Value number 1 = " << martin.p[1] << "\n";
-		std::cout << "Wanna end?\n";
-		std::cin >> answ;
-		if (!answ.compare("y"))
-		{
-			end = true;
-		}
-	}
+	std::string one = "1";
+	std::string two = "2";
+	bool end = false;
+	int number;
 
-	
-	for (int i = 1; i <= martin.size; i++)
+	in.open("heap.txt", std::ios::in);
+	while (in >> number)
 	{
-		std::cout << "Value number " << i << "= " << martin.p[i-1]<<"\n";
+		anthony.addElem(number);
 	}
-	
-	std::cout << "Byebye \n";
+	in.close();
+
+	for (int i = 0; i < anthony._vector.size(); i++)
+		printf("%d\t", anthony._vector[i]);
+
+	printf("\n\n");
+
+	anthony.printHeap("","",0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/*while (!end)
+	{
+		printf("What do you want to do?:\n"
+			"1 - Add element at head\n"
+			"2 - Add element at tail\n"
+			"3 - Add element at random\n"
+			"4 - Remove element at head\n"
+			"5 - Remove element at tail\n"
+			"6 - Remove element at random\n"
+			"7 - Find element\n");
+		std::cin >> answ;
+		if (answ.compare(one) ==0) {
+			std::cin >> number;
+			martin.addElem_head(number);
+		}
+		else if (answ.compare(two)==0) {
+			std::cin >> number;
+			martin.addElem_tail(number);
+		}
+		else if (answ.compare("7") == 0)
+		{
+			std::cin >> number;
+			martin.findElem(number);
+			std::cout << number << "\n";
+		}
+			
+		for (int i = 0; i < martin.size; i++)
+		{
+			printf("Number %d: %d\n", i + 1, martin.p[i]);
+		}
+	}*/
+
+	/*in.open("1-10000.txt", std::ios::out);
+	for (int i = 1; i <= 10000; i++)
+	{
+		in << i << "\n";
+	}
+	in.close();*/
+
 	return 0;
 }
