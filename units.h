@@ -54,12 +54,78 @@ public:
 	node * findElem(int elem);
 };
 
+struct heapnode
+{
+	int data, index;
+	heapnode *parent, *leftch, *rightch;
+};
+
 class Bheap
 {
 public:
-	std::vector<int> _vector;
-	void goUp(int index);
-	void addElem(int elem);
-	void removeRoot();
-	void printHeap(std::string sp, std::string sn, int v);
+	Bheap()
+	{
+		size = 0;
+	}
+
+	int* root;
+	int size;
+	void daddElem(int elem);
+	void dgoUp(int p);
+	void dremoveRoot();
+	int dfindElem(int elem);
+	void dprintHeap(std::string sp, std::string sn, int v);
+};
+
+struct BSTnode
+{
+	BSTnode * parent, *leftch, * rightch;
+	int key;
+};
+
+class BST
+{
+public:
+	BSTnode * root;
+	BST()
+	{
+		root = NULL;
+	}
+	void addElem(BSTnode *& root, int v);
+	void printBST(std::string sp, std::string sn, BSTnode * v);
+	BSTnode * findNode(BSTnode * p, int key);
+	BSTnode * minBST(BSTnode *p);
+	BSTnode * succBST(BSTnode * p);
+	void deleteNode(BSTnode *&root, BSTnode * x);
+};
+
+struct RBTNode
+{
+	RBTNode * up;
+	RBTNode * left;
+	RBTNode * right;
+	int key;
+	char color;
+	int data;
+};
+
+class RBTree
+{
+private:
+	RBTNode S;
+	RBTNode * root;
+	std::string cr, cl, cp;
+
+	void printRBT(std::string sp, std::string sn, RBTNode * p);
+
+public:
+	RBTree();
+	void print();
+	RBTNode * findRBT(int k);
+	RBTNode * minRBT(RBTNode * p);
+	RBTNode * succRBT(RBTNode * p);
+	void rot_L(RBTNode * A);
+	void rot_R(RBTNode * A);
+	void insertRBT(int k);
+	void removeRBT(RBTNode * X);
 };

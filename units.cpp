@@ -208,41 +208,55 @@ node * List::findElem(int elem)
 	return p;
 }
 
-void Bheap::goUp(int index)
+void Bheap::daddElem(int elem)
 {
-	if (index == 0)
+	size++;
+
+	root = (int*)realloc(root, sizeof(int)*size);
+	root[size - 1] = elem;
+	dgoUp(size - 1);
+}
+
+void Bheap::dgoUp(int p)
+{
+	if (p == 0)
 		return;
 
-	int parent = (index - 1) / 2;
+	int parent = (p - 1) / 2;
 
-	if (_vector[parent] < _vector[index])
+	if (root[parent] < root[p])
 	{
-		int temp = _vector[parent];
-		_vector[parent] = _vector[index];
-		_vector[index] = temp;
-		goUp(parent);
+		int temp = root[parent];
+		root[parent] = root[p];
+		root[p] = temp;
+		dgoUp(parent);
 	}
 }
 
-void Bheap::addElem(int elem)
+void Bheap::dremoveRoot()
 {
-	int length = _vector.size();
-	_vector.push_back(elem);
-	goUp(length);
-}
-
-void Bheap::removeRoot()
-{
-	int length = _vector.size();
+	int length = size;
 
 	if (length == 0)
 		return;
 
-	_vector[0] = _vector[length - 1];
-	goUp(0);
+	root[0] = root[length - 1];
+	dgoUp(0);
 }
 
-void Bheap::printHeap(std::string sp, std::string sn, int v)
+int Bheap::dfindElem(int elem)
+{
+	int v;
+	for (int i = 0; i < size; i++)
+	{
+		if (root[i] == elem)
+			v = root[i];
+	}
+
+	return v;
+}
+
+void Bheap::dprintHeap(std::string sp, std::string sn, int v)
 {
 	std::string cr, cl, cp;
 	cr = cl = cp = "  ";
@@ -252,18 +266,440 @@ void Bheap::printHeap(std::string sp, std::string sn, int v)
 
 	std::string s;
 
-	if (v < _vector.size())
+	if (v < size)
 	{
 		s = sp;
 		if (sn == cr) s[s.length() - 2] = ' ';
-		printHeap(s + cp, cr, 2 * v + 2);
+		dprintHeap(s + cp, cr, 2 * v + 2);
 
 		s = s.substr(0, sp.length() - 2);
 
-		std::cout << s << sn << _vector[v] << std::endl;
+		std::cout << s << sn << root[v] << std::endl;
 
 		s = sp;
 		if (sn == cl) s[s.length() - 2] = ' ';
-		printHeap(s + cp, cl, 2 * v + 1);
+		dprintHeap(s + cp, cl, 2 * v + 1);
 	}
 }
+
+void BST::addElem(BSTnode *& root, int v)
+{
+	BSTnode * q, *w;
+	w = new BSTnode;
+
+	w->leftch = w->rightch = NULL;
+	w->key = v;
+
+	q = root;
+
+	if (!q)
+		root = w;
+	else
+		while (true)
+			if (v < q->key)
+			{
+				if (!q->leftch)
+				{
+					q->leftch = w;
+					break;
+				}
+				else q = q->leftch;
+			}
+			else
+			{
+				if (!q->rightch)
+				{
+					q->rightch = w;
+					break;
+				}
+				else q = q->rightch;
+			}
+
+	w->parent = q;
+}
+
+void BST::printBST(std::string sp, std::string sn, BSTnode * v)
+{
+	std::string cr, cl, cp;
+	cr = cl = cp = "  ";
+	cr[0] = 218; cr[1] = 196;
+	cl[0] = 192; cl[1] = 196;
+	cp[0] = 179;
+
+	std::string s;
+
+	if (v)
+	{
+		s = sp;
+		if (sn == cr) s[s.length() - 2] = ' ';
+		printBST(s + cp, cr, v->rightch);
+
+		s = s.substr(0, sp.length() - 2);
+		std::cout << s << sn << v->key << std::endl;
+
+		s = sp;
+		if (sn == cl) s[s.length() - 2] = ' ';
+		printBST(s + cp, cl, v->leftch);
+	}
+}
+
+BSTnode * BST::findNode(BSTnode * p, int k)
+{
+	while (p &&p->key != k)
+		p = (k < p->key) ? p->leftch : p->rightch;
+	return p;
+}
+
+BSTnode * BST::minBST(BSTnode * p)
+{
+	if (p) while (p->leftch) p = p->leftch;
+	return p;
+}
+
+BSTnode * BST::succBST(BSTnode * p)
+{
+	BSTnode * r;
+
+	if (p)
+	{
+		if (p->rightch) return minBST(p->rightch);
+		else
+		{
+			r = p->parent;
+			while (r && (p == r->rightch))
+			{
+				p = r;
+				r = r->parent;
+			}
+			return r;
+		}
+	}
+	return p;
+}
+
+void BST::deleteNode(BSTnode *& root, BSTnode * x)
+{
+	BSTnode * Y, *Z;
+
+	if (x)
+	{
+		Y = !x->leftch || !x->rightch ? x : succBST(x);
+
+		Z = Y->leftch ? Y->leftch : Y->rightch;
+
+		if (Z) Z->parent = Y->parent;
+
+		if (!Y->parent) root = Z;
+		else if (Y == Y->parent->leftch) Y->parent->leftch = Z;
+		else                      Y->parent->rightch = Z;
+
+		if (Y != x) x->key = Y->key;
+
+		delete Y;
+
+	}
+}
+
+RBTree::RBTree()
+{
+	cr = cl = cp = "  ";
+	cr[0] = 218; cr[1] = 196;
+	cl[0] = 192; cl[1] = 196;
+	cp[0] = 179;
+	S.color = 'B';
+	S.up = &S;
+	S.left = &S;
+	S.right = &S;
+	root = &S;
+}
+
+void RBTree::printRBT(std::string sp, std::string sn, RBTNode * p)
+{
+	std::string t;
+
+	if (p != &S)
+	{
+		t = sp;
+		if (sn == cr) t[t.length() - 2] = ' ';
+		printRBT(t + cp, cr, p->right);
+
+		t = t.substr(0, sp.length() - 2);
+		std::cout << t << sn << p->color << ":" << p->key << std::endl;
+
+		t = sp;
+		if (sn == cl) t[t.length() - 2] = ' ';
+		printRBT(t + cp, cl, p->left);
+	}
+}
+
+void RBTree::print()
+{
+	printRBT("", "", root);
+}
+
+RBTNode * RBTree::findRBT(int k)
+{
+	RBTNode * p;
+
+	p = root;
+	while ((p != &S) && (p->key != k))
+		if (k < p->key) p = p->left;
+		else           p = p->right;
+		if (p == &S) return NULL;
+		return p;
+}
+
+RBTNode * RBTree::minRBT(RBTNode * p)
+{
+	if (p != &S)
+		while (p->left != &S) p = p->left;
+	return p;
+}
+
+RBTNode * RBTree::succRBT(RBTNode * p)
+{
+	RBTNode * r;
+
+	if (p != &S)
+	{
+		if (p->right != &S) return minRBT(p->right);
+		else
+		{
+			r = p->up;
+			while ((r != &S) && (p == r->right))
+			{
+				p = r;
+				r = r->up;
+			}
+			return r;
+		}
+	}
+	return &S;
+}
+
+void RBTree::rot_L(RBTNode * A)
+{
+	RBTNode * B, *p;
+
+	B = A->right;
+	if (B != &S)
+	{
+		p = A->up;
+		A->right = B->left;
+		if (A->right != &S) A->right->up = A;
+
+		B->left = A;
+		B->up = p;
+		A->up = B;
+
+		if (p != &S)
+		{
+			if (p->left == A) p->left = B; else p->right = B;
+		}
+		else root = B;
+	}
+}
+
+void RBTree::rot_R(RBTNode * A)
+{
+	RBTNode * B, *p;
+
+	B = A->left;
+	if (B != &S)
+	{
+		p = A->up;
+		A->left = B->right;
+		if (A->left != &S) A->left->up = A;
+
+		B->right = A;
+		B->up = p;
+		A->up = B;
+
+		if (p != &S)
+		{
+			if (p->left == A) p->left = B; else p->right = B;
+		}
+		else root = B;
+	}
+}
+
+void RBTree::insertRBT(int k)
+{
+	RBTNode * X, *Y;
+
+	X = new RBTNode;
+	X->left = &S;
+	X->right = &S;
+	X->up = root;
+	X->key = k;
+	if (X->up == &S) root = X;
+	else
+		while (true)
+		{
+			if (k < X->up->key)
+			{
+				if (X->up->left == &S)
+				{
+					X->up->left = X;
+					break;
+				}
+				X->up = X->up->left;
+			}
+			else
+			{
+				if (X->up->right == &S)
+				{
+					X->up->right = X;
+					break;
+				}
+				X->up = X->up->right;
+			}
+		}
+	X->color = 'R';
+	while ((X != root) && (X->up->color == 'R'))
+	{
+		if (X->up == X->up->up->left)
+		{
+			Y = X->up->up->right;
+
+			if (Y->color == 'R')
+			{
+				X->up->color = 'B';
+				Y->color = 'B';
+				X->up->up->color = 'R';
+				X = X->up->up;
+				continue;
+			}
+
+			if (X == X->up->right)
+			{
+				X = X->up;
+				rot_L(X);
+			}
+
+			X->up->color = 'B';
+			X->up->up->color = 'R';
+			rot_R(X->up->up);
+			break;
+		}
+		else
+		{
+			Y = X->up->up->left;
+
+			if (Y->color == 'R')
+			{
+				X->up->color = 'B';
+				Y->color = 'B';
+				X->up->up->color = 'R';
+				X = X->up->up;
+				continue;
+			}
+
+			if (X == X->up->left)
+			{
+				X = X->up;
+				rot_R(X);
+			}
+
+			X->up->color = 'B';
+			X->up->up->color = 'R';
+			rot_L(X->up->up);
+			break;
+		}
+	}
+	root->color = 'B';
+}
+
+void RBTree::removeRBT(RBTNode * X)
+{
+	RBTNode * W, *Y, *Z;
+
+	if ((X->left == &S) || (X->right == &S)) Y = X;
+	else Y = succRBT(X);
+
+	if (Y->left != &S) Z = Y->left;
+	else              Z = Y->right;
+
+	Z->up = Y->up;
+
+	if (Y->up == &S) root = Z;
+	else if (Y == Y->up->left) Y->up->left = Z;
+	else                      Y->up->right = Z;
+
+	if (Y != X) X->key = Y->key;
+
+	if (Y->color == 'B')
+		while ((Z != root) && (Z->color == 'B'))
+			if (Z == Z->up->left)
+			{
+				W = Z->up->right;
+
+				if (W->color == 'R')
+				{
+					W->color = 'B';
+					Z->up->color = 'R';
+					rot_L(Z->up);
+					W = Z->up->right;
+				}
+
+				if ((W->left->color == 'B') && (W->right->color == 'B'))
+				{
+					W->color = 'R';
+					Z = Z->up;
+					continue;
+				}
+
+				if (W->right->color == 'B')
+				{
+					W->left->color = 'B';
+					W->color = 'R';
+					rot_R(W);
+					W = Z->up->right;
+				}
+
+				W->color = Z->up->color;
+				Z->up->color = 'B';
+				W->right->color = 'B';
+				rot_L(Z->up);
+				Z = root;
+			}
+			else
+			{
+				W = Z->up->left;
+
+				if (W->color == 'R')
+				{
+					W->color = 'B';
+					Z->up->color = 'R';
+					rot_R(Z->up);
+					W = Z->up->left;
+				}
+
+				if ((W->left->color == 'B') && (W->right->color == 'B'))
+				{
+					W->color = 'R';
+					Z = Z->up;
+					continue;
+				}
+
+				if (W->left->color == 'B')
+				{
+					W->right->color = 'B';
+					W->color = 'R';
+					rot_L(W);
+					W = Z->up->left;
+				}
+
+				W->color = Z->up->color;
+				Z->up->color = 'B';
+				W->left->color = 'B';
+				rot_R(Z->up);
+				Z = root;
+			}
+
+	Z->color = 'B';
+
+	delete Y;
+}
+
+
